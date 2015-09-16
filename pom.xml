@@ -7,8 +7,12 @@
     <version>1.0-SNAPSHOT</version>
     <name>spring-amq Maven Webapp</name>
     <url>http://maven.apache.org</url>
-    <dependencies>
 
+    <properties>
+        <spring.version>3.0.7.RELEASE</spring.version>
+    </properties>
+
+    <dependencies>
 
         <dependency>
             <groupId>org.apache.activemq</groupId>
@@ -16,15 +20,29 @@
             <version>5.7.0</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jms</artifactId>
-            <version>3.0.7.RELEASE</version>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
+
     <build>
         <finalName>spring-amq</finalName>
     </build>
+
 </project>

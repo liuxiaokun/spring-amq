@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+
+    http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <!--服务厂商提供的连接工厂-->
+    <bean id="targetConnectionFactory"
+          class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+    </bean>
+
+    <!--Spring提供的ConnectionFactory是Spring用于管理ConnectionFactory的，
+    真正产生到JMS服务器链接的ConnectionFactory还得是由JMS服务厂商提供，
+    并且需要把它注入到Spring提供的ConnectionFactory中。-->
+    <bean id="connectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
+        <property name="targetConnectionFactory" ref="targetConnectionFactory"/>
+    </bean>
+
+    <!-- 声明ActiveMQ消息目标,目标可以是一个Queue，也可以是一个主题Topic-->
+    <bean id="queue1" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="queue1"/>
+    </bean>
+
+    <bean id="topic1" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="topic1"/>
+    </bean>
+
+
+    <bean id="jmsTemplateTopic" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="defaultDestination" ref="topic1"/>
+        <property name="receiveTimeout" value="600"/>
+        <!--pubSubDomain 发布订阅模式， 默认为false代表p2p， true代表订阅-->
+        <property name="pubSubDomain" value="true"/>
+    </bean>
+
+
+    <bean id="jmsTemplateQueue" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="defaultDestination" ref="queue1"/>
+        <property name="receiveTimeout" value="600"/>
+        <!--pubSubDomain 发布订阅模式， 默认为false代表p2p， true代表订阅-->
+        <property name="pubSubDomain" value="false"/>
+    </bean>
+
+
+    <bean id="sender" class="com.fred.demo.Sender">
+        <property name="jmsTemplate" ref="jmsTemplateQueue"/>
+        <property name="destination" value="queue1"/>
+    </bean>
+
+
+    <!-- 消息监听器 -->
+    <bean id="consumerMessageListener" class="com.fred.demo.ConsumerMessageListener"/>
+
+    <!-- 消息监听容器 -->
+    <bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="queue1"/>
+        <property name="messageListener" ref="consumerMessageListener"/>
+    </bean>
+
+</beans>

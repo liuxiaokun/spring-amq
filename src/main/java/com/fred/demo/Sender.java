@@ -14,11 +14,8 @@ import javax.jms.Session;
  */
 public class Sender {
 
-
     private JmsTemplate jmsTemplate;
-
     private String destination;
-
 
     public void send(final String message) {
 
